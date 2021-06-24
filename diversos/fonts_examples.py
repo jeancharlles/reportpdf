@@ -18,10 +18,13 @@ def fonts(canvas):
     x = 1.8*inch
     y = 2.7*inch
     for font in canvas.getAvailableFonts():
+        # O texto
         canvas.setFont(psfontname=font, size=10)
         canvas.drawString(x=x, y=y, text=text)
+
+        # Da direita para esquerda o nome das fontes
         canvas.setFont(psfontname="Helvetica", size=10)
-        canvas.drawRightString(x=x-10, y=y, text=font+":")
+        canvas.drawRightString(x=x-10, y=y, text=font + ":")
         y = y-13
 
 

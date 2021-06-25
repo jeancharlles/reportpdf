@@ -4,7 +4,7 @@ from reportlab.lib.pagesizes import A4
 
 
 def translate(canvas):
-    canvas.translate(0.5*cm, 12*cm)
+    canvas.translate(2*cm, 12*cm)
 
 
 def scale(canvas):
@@ -20,19 +20,21 @@ bought up the rights now
 and she'll have fun fun fun
 til her Daddy takes the keyboard away''')
 
-
 lyrics = lyrics.split("\n")
 
 
-def cursormoves2(canvas):
+def horizontalscale(canvas):
     textobject = canvas.beginText()
-    textobject.setTextOrigin(x=2, y=2.5*inch)
-    textobject.setFont(psfontname="Helvetica-Oblique", size=14)
+    textobject.setTextOrigin(x=3, y=2.5*inch)
+    textobject.setFont(psfontname="Helvetica", size=12)
+
+    horizontal_scale = 80
     for line in lyrics:
-        textobject.textOut(text=line)
-        textobject.moveCursor(dx=14, dy=14)  # POSITIVE Y moves down!!!
-    textobject.setFillColorRGB(r=0.4, g=0, b=1)
-    textobject.textLines(stuff='''
+        textobject.setHorizScale(horizontal_scale)  # Escala Horizontalmente as letras, sem interferir a altura da letra
+        textobject.textLine("%s: %s" % (horizontal_scale, line))
+        horizontal_scale += 10
+    textobject.setFillColorCMYK(c=0, m=0.4, y=0.4, k=0.2)
+    textobject.textLines('''
     With many apologies to the Beach Boys
     and anyone else who finds this objectionable
     ''')
@@ -40,9 +42,9 @@ def cursormoves2(canvas):
 
 
 if __name__ == '__main__':
-    pdf = Canvas(filename="text_object_methods2.pdf", pagesize=A4)
+    pdf = Canvas(filename='horizontal_scaling.pdf', pagesize=A4)
     translate(pdf)
     scale(pdf)
-    cursormoves2(pdf)
+    horizontalscale(pdf)
     pdf.showPage()
     pdf.save()

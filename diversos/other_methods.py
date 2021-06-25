@@ -20,32 +20,36 @@ bought up the rights now
 and she'll have fun fun fun
 til her Daddy takes the keyboard away''')
 
+
 lyrics = lyrics.split("\n")
+rise = 0
+mode = 0
 
 
-def charspace(canvas):
+def other_methods(canvas):
     textobject = canvas.beginText()
-    textobject.setTextOrigin(4, 2.5*inch)
-    textobject.setFont(psfontname="Helvetica-Oblique", size=12)
-    char_space = 0
+    textobject.setTextOrigin(x=2, y=3*inch)
+    textobject.setFont(psfontname="Helvetica", size=14)
 
+    varrise = 0
+    modes = 0
     for line in lyrics:
-        textobject.setCharSpace(char_space)  # Espaçamento entre os caracteres
-        textobject.textLine("%s: %s" % (char_space, line))
-        char_space += 0.5
-
-    textobject.setFillGray(gray=0.4)
-    textobject.textLines('''
-    With many apologies to the Beach Boys
-    and anyone else who finds this objectionable
-    ''')
+        textobject.setTextRenderMode(mode=modes)  # possíveis 0, 1, 2, 3, 4, 5, 6, 7
+        textobject.setRise(rise=varrise)
+        textobject.textLine(f'mode={modes} rise={varrise} : {line}')
+        if varrise == 0:
+            varrise += 1
+        else:
+            varrise -= 1
+        modes += 1
+    textobject.textLines(stuff=lyrics)
     canvas.drawText(aTextObject=textobject)
 
 
 if __name__ == '__main__':
-    pdf = Canvas(filename="character_spacing.pdf", pagesize=A4)
+    pdf = Canvas(filename='other_methods.pdf', pagesize=A4)
     translate(pdf)
     scale(pdf)
-    charspace(pdf)
+    other_methods(pdf)
     pdf.showPage()
     pdf.save()

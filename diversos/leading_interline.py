@@ -4,7 +4,7 @@ from reportlab.lib.pagesizes import A4
 
 
 def translate(canvas):
-    canvas.translate(0.5*cm, 12*cm)
+    canvas.translate(2*cm, 12*cm)
 
 
 def scale(canvas):
@@ -20,29 +20,33 @@ bought up the rights now
 and she'll have fun fun fun
 til her Daddy takes the keyboard away''')
 
-
 lyrics = lyrics.split("\n")
 
 
-def cursormoves2(canvas):
+def leading_interlines(canvas):
     textobject = canvas.beginText()
-    textobject.setTextOrigin(x=2, y=2.5*inch)
-    textobject.setFont(psfontname="Helvetica-Oblique", size=14)
+    textobject.setTextOrigin(x=3, y=2.5*inch)
+    # textobject.setFont(psfontname="Helvetica", size=14, leading=16)
+    textobject.setFont(psfontname="Helvetica", size=14, leading=None)
+    leading = 8
     for line in lyrics:
-        textobject.textOut(text=line)
-        textobject.moveCursor(dx=14, dy=14)  # POSITIVE Y moves down!!!
-    textobject.setFillColorRGB(r=0.4, g=0, b=1)
+        # textobject.setLeading(leading=8)
+        textobject.setLeading(leading=leading)
+        textobject.textLine("%s: %s" % (leading, line))
+        # textobject.textLine("%s" % line)
+        leading += 2.5
+    textobject.setFillColorCMYK(c=0.8, m=0, y=0, k=0.3)
     textobject.textLines(stuff='''
     With many apologies to the Beach Boys
     and anyone else who finds this objectionable
     ''')
-    canvas.drawText(textobject)
+    canvas.drawText(aTextObject=textobject)
 
 
 if __name__ == '__main__':
-    pdf = Canvas(filename="text_object_methods2.pdf", pagesize=A4)
+    pdf = Canvas(filename="leading_interline.pdf", pagesize=A4)
     translate(pdf)
     scale(pdf)
-    cursormoves2(pdf)
+    leading_interlines(pdf)
     pdf.showPage()
     pdf.save()

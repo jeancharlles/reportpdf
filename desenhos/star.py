@@ -12,32 +12,31 @@ def scale(canvas):
     canvas.scale(1.2, 1.2)
 
 
-def star(canvas, title="Title Here", aka="Comment here.", xcenter=None, ycenter=None, nvertices=5):
+def star(canvas):
+    title = "Title Here"
+    aka = "Comment here."
+    nvertices = 5
+    radius = 1*inch
+    xcenter = 2.75*inch
+    ycenter = 1.5*inch
 
-    radius = inch/3
-
-    if xcenter is None:
-        xcenter = 2.75*inch
-
-    if ycenter is None:
-        ycenter = 1.5*inch
-
-    canvas.drawCentredString(xcenter, ycenter+1.3*radius, title)
-    canvas.drawCentredString(xcenter, ycenter-1.4*radius, aka)
+    canvas.drawCentredString(x=xcenter, y=ycenter+1.3*radius, text=title)
+    canvas.drawCentredString(x=xcenter, y=ycenter-1.4*radius, text=aka)
     p = canvas.beginPath()
-    p.moveTo(xcenter, ycenter+radius)
+    p.moveTo(xcenter, ycenter + radius)
 
     angle = (2*pi)*2/5.0
     startangle = pi/2.0
 
-    for vertex in range(nvertices - 1):
+    for vertex in range(nvertices):
         nextangle = angle*(vertex + 1) + startangle
         x = xcenter + radius*cos(nextangle)
         y = ycenter + radius*sin(nextangle)
         p.lineTo(x, y)
-        if nvertices == 5:
-            p.close()
         canvas.drawPath(p)
+
+    if nvertices > 5:
+        p.close()
 
 
 if __name__ == '__main__':

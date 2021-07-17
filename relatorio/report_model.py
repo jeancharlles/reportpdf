@@ -12,8 +12,6 @@ def scale(canvas):
 
 
 def cursormoves1(canvas):
-
-    #  ---Primeiro Texto ----#
     """Returns a fresh text object.  Text objects are used
        to add large amounts of text.  See PDFTextObject
        Coloque dentro de colchetes o texto []"""
@@ -31,20 +29,16 @@ def cursormoves1(canvas):
     textobject.setFont(psfontname="Helvetica-Oblique", size=14)  # Configurar a fonte e o tamanho do texto
     for line in lyrics:
         textobject.textLines(stuff=line, trim=1)
-
-    # ----Segundo Texto em Cinza -----#
     textobject.setFillGray(gray=0.4)
     textobject.textLines(stuff='''    
         With many apologies to the Beach Boys
         and anyone else who finds this objectionable
         ''', trim=1)
-
-    # ----Desenho dos 02 textos ------#
     canvas.drawText(aTextObject=textobject)
 
 
 if __name__ == '__main__':
-    pdf = Canvas(filename="text_object_methods.pdf", pagesize=A4)
+    pdf = Canvas(filename="text_report_model.pdf", pagesize=A4)
     translate(pdf)
     scale(pdf)
     cursormoves1(pdf)

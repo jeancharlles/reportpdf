@@ -12,10 +12,14 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse
 from weasyprint import HTML
 
-from django.views.generic import View
+from django.views.generic.base import TemplateView, View
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from relatorio.models import Contact
+
+
+class IndexView(TemplateView):
+    template_name = "relatorio/index.html"
 
 
 class ContactListView(ListView):
@@ -31,18 +35,19 @@ class ContactDetailView(DetailView):
         return context
 
 
-# -------------------- ReportLab ---------------------------#
+# --------------------------- ReportLab ---------------------------------#
 class PDFView(View):
 
     @staticmethod
     def get(request, *args, **kwargs):
 
-        # ------- Configuração Inicial-------
+        # ------- Configuração Inicial----------------------#
         buffer = io.BytesIO()
         pdf = Canvas(buffer)
+        pdf.setTitle(title="Listagem de Nomes")
+        contato = Contact()
 
-        # ------- Nome Completo -------------
-
+        # ------- Nome -------------------------------------#
         pdf.setFont(psfontname="Helvetica-Bold", size=12)
         pdf.setFillColor(aColor=black)
         pdf.drawString(x=2*cm, y=27*cm, text='Nome Completo: ')
@@ -55,21 +60,25 @@ class PDFView(View):
         # texto = str(Contact.objects.all().values_list())
         # texto = str(Contact.objects.all())
         # texto = str(Contact.objects.all().first())
-
-        texto = Contact.objects.all().order_by('first_name')
+        # ----Funcionando ----#
+        # texto = Contact.objects.all().order_by('first_name')
         # texto = Contact.objects.all().order_by('-first_name') # ordem inversa
+        # textobject = pdf.beginText(x=2*cm, y=26*cm)
+        # textobject.setFont(psfontname="Helvetica-Oblique", size=14)
+        # textobject.setFillColor(aColor=gold)
+        # for nome in texto:
+        #     textobject.textLines(stuff=str(nome), trim=1)
 
+        texto = Contact.objects.all()
         textobject = pdf.beginText(x=2*cm, y=26*cm)
         textobject.setFont(psfontname="Helvetica-Oblique", size=14)
         textobject.setFillColor(aColor=gold)
-
-        # textobject.textLines(stuff=texto, trim=1)
-        for nome in texto:
-            textobject.textLines(stuff=str(nome), trim=1)
+        for idade in texto.age:
+            textobject.textLines(stuff=str(idade), trim=1)
 
         pdf.drawText(aTextObject=textobject)
 
-        # -------- Idade -------------#
+        # -------- Idade ---------------------------------#
         pdf.setFont(psfontname="Courier-Bold", size=14)
         pdf.setFillColor(aColor=green)
         pdf.drawString(x=2 * cm, y=23 * cm, text='Idade menor que 50: ')
@@ -78,7 +87,6 @@ class PDFView(View):
         pdf.line(x1=2 * cm, y1=22.8 * cm, x2=8 * cm, y2=22.8 * cm)
 
         idade = Contact.objects.filter(age__lt=50)
-
         idadeobject = pdf.beginText(x=2*cm, y=22*cm)
         pdf.setFillColor(aColor=blue)
 
@@ -86,18 +94,19 @@ class PDFView(View):
             idadeobject.textLines(stuff=str(i), trim=1)
         pdf.drawText(aTextObject=idadeobject)
 
-        # ---- Apresentação Final do PDF --------
+        # ------- Apresentação Final do PDF -------------------#
         pdf.showPage()
         pdf.save()
         buffer.seek(0)
         return FileResponse(buffer, as_attachment=False, filename='index.pdf')
 
 
+# --------------------------- Weasy Print ------------------------------#
 def some_view3(request):
     HTML('http://weasyprint.org/').write_pdf('/tmp/weasyprint-website.pdf')
 
 
-# --------------------- ReportLab -------------------------- #
+# --------------------------- ReportLab --------------------------------#
 def some_view2(request):
     # Crie o objeto HttpResponse com o cabeçalho de PDF apropriado.
     response = HttpResponse(content_type='application/pdf')
@@ -106,25 +115,39 @@ def some_view2(request):
     # Crie o objeto PDF, usando o objeto response como seu "arquivo".
     p = Canvas(response)
 
-    # --- Texto Objeto -----#
-    p.setFont(psfontname="Helvetica", size=14)
-    # p.setStrokeColor(aColor=blue)
+    # ----Configuração do Título ----#
+    p.setTitle(title="Clientes")
+
+    # --- Configuração da Linha -----#
+    p.setStrokeColor(aColor=blue)
+    p.line(x1=2 * cm, y1=27.8 * cm, x2=7 * cm, y2=27.8 * cm)
+
+    # --- Configuração do Texto -----#
     p.setFillColorRGB(r=0.5, g=0.2, b=1)
-    p.drawString(x=2*cm, y=27*cm, text='Nome: ')
+    p.setFont(psfontname="Helvetica-Bold", size=14)
+    p.drawString(x=2*cm, y=28*cm, text='Clientes:')
+
+    # --- Configuração do Objeto Texto ---#
     textobject = p.beginText()
-    textobject.setTextOrigin(x=3.5 * cm, y=27 * cm)
+    textobject.setTextOrigin(x=2*cm, y=27*cm)
     textobject.setFont(psfontname="Helvetica", size=14)
-    textobject.setStrokeColor(aColor=blue)
-    contato = Contact.objects.filter(pk=2).get()
+
+    # ---- Configuração Model ------------#
+    contato = Contact.objects.filter(pk=1).get()
     nome = contato.first_name
     sobrenome = contato.last_name
-    textobject.textLines(stuff=nome + " " + sobrenome)
+    idade = contato.age
+    textobject.textLines(stuff=f'Nome: {nome} \n'
+                               f'Sobrenome: {sobrenome} \n'
+                               f'Idade: {idade}')
     p.drawText(aTextObject=textobject)
 
-    # Mostre o Objeto
+    # --- Mostra o página ---#
     p.showPage()
-    # Salve o arquivo e retorne o response
+
+    # --- Salve o arquivo e retorne o response ----#
     p.save()
+
     return response
 
 

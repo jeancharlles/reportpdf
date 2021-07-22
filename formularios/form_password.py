@@ -1,4 +1,7 @@
 from reportlab.pdfgen import canvas
+from reportlab.lib import pdfencrypt
+
+enc = pdfencrypt.StandardEncryption("rptlab", canPrint=0)
 
 
 def hello(c):
@@ -6,7 +9,7 @@ def hello(c):
 
 
 if __name__ == '__main__':
-    pdf = canvas.Canvas(filename="form_password.pdf")
+    pdf = canvas.Canvas(filename="form_password.pdf", encrypt=enc)
     hello(pdf)
     pdf.showPage()
     pdf.save()

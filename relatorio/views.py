@@ -35,7 +35,7 @@ class ContactDetailView(DetailView):
         return context
 
 
-# --------------------------- ReportLab ---------------------------------#
+# --------------------------- ReportLab 1---------------------------------#
 class PDFView(View):
 
     @staticmethod
@@ -101,12 +101,12 @@ class PDFView(View):
         return FileResponse(buffer, as_attachment=False, filename='index.pdf')
 
 
-# --------------------------- Weasy Print ------------------------------#
+# --------------------------- Weasy Print -------------------------------#
 def some_view3(request):
     HTML('http://weasyprint.org/').write_pdf('/tmp/weasyprint-website.pdf')
 
 
-# --------------------------- ReportLab --------------------------------#
+# --------------------------- ReportLab 2--------------------------------#
 def some_view2(request):
     # Crie o objeto HttpResponse com o cabeçalho de PDF apropriado.
     response = HttpResponse(content_type='application/pdf')
@@ -117,6 +117,7 @@ def some_view2(request):
 
     # ----Configuração do Título ----#
     p.setTitle(title="Clientes")
+    p.setAuthor(author="JC9")
 
     # --- Configuração da Linha -----#
     p.setStrokeColor(aColor=blue)
@@ -147,7 +148,6 @@ def some_view2(request):
 
     # --- Salve o arquivo e retorne o response ----#
     p.save()
-
     return response
 
 

@@ -14,5 +14,3 @@ story.append(Paragraph(text="This is a paragraph in normal <i> Itálico </i> sty
 
 doc = SimpleDocTemplate(filename='platypus_pagetemplate.pdf', pagesize=letter)
 doc.build(flowables=story)
-
-

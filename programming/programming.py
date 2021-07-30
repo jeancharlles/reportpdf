@@ -2,7 +2,7 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph
 from reportlab.platypus.flowables import DocAssign, DocExec, DocPara, DocIf, DocWhile
 
-doc = SimpleDocTemplate(filename='programming.pdf')
+pdf = SimpleDocTemplate(filename='programming.pdf')
 
 normal = ParagraphStyle(name='Normal', fontName='Helvetica', fontSize=8.5, leading=11)
 header = ParagraphStyle(name='Heading1', parent=normal, fontSize=14, leading=19, spaceAfter=6, keepWithNext=1)
@@ -29,10 +29,9 @@ story = [
           elseBlock=Paragraph('The value of i is not less than 3', normal)),
 
     DocWhile(cond='i',
-             whileBlock=[DocPara('i', format='The value of i is %(__expr__)d', style=normal),
-                         DocExec('i-=1')]),
+             whileBlock=[DocPara('i', format='The value of i is %(__expr__)d', style=normal), DocExec('i-=1')]),
 
     # DocPara(expr='repr(doc._nameSpace)', escape=True),
 ]
 
-doc.build(story)
+pdf.build(story)

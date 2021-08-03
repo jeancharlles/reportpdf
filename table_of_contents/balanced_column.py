@@ -1,7 +1,7 @@
-from reportlab.platypus import ListFlowable, ListItem, Paragraph, SimpleDocTemplate
+from reportlab.platypus import ListFlowable, ListItem, Paragraph, SimpleDocTemplate, BalancedColumns
 from reportlab.lib.styles import getSampleStyleSheet
 
-pdf = SimpleDocTemplate(filename="list_flowable.pdf")
+pdf = SimpleDocTemplate(filename="balanced_column.pdf")
 style = getSampleStyleSheet()
 style_normal = style["Normal"]
 story = list()
@@ -20,6 +20,14 @@ t = ListFlowable(flowables=[
     bulletType='i'
     )
 
-story.append(t)
+story.append(
+    BalancedColumns(
+        F=t,
+        nCols=2,
+        needed=72,
+        name='',
+        endSlack=0.1,
+    )
+)
 
 pdf.build(flowables=story)

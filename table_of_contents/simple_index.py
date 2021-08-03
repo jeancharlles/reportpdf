@@ -10,17 +10,17 @@ styles = getSampleStyleSheet()
 text = """
 this is sample <index item="index"/> without index
 """
-p_text = Paragraph(text, style=styles['Normal'])
+p_text = Paragraph(text=text, style=styles['Normal'])
 
 text1 = """
 this is sample <index item="reportlab"/> with reportlab index
 """
-p_text1 = Paragraph(text1, style=styles['Normal'])
+p_text1 = Paragraph(text=text1, style=styles['Normal'])
 
 text2 = """
 this is sample <index item="flowable"/> with flowable index
 """
-p_text2 = Paragraph(text2, style=styles['Normal'])
+p_text2 = Paragraph(text=text2, style=styles['Normal'])
 
 index = SimpleIndex()
 

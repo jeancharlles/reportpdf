@@ -23,6 +23,11 @@ pc.slices[3].strokeWidth = 1  # Largura da linha da fatia d
 pc.slices[3].strokeDashArray = [2, 2]  # Desenha o tracejado
 pc.slices[3].labelRadius = 1.25  # distância do label d em relação ao raio
 pc.slices[3].fontColor = red  # cor da fonte do label d
+
+pc.simpleLabels = 0
+pc.slices[2].label_angle = 90
+
+
 d.add(pc, '')
 
 renderPDF.drawToFile(d=d, fn="graphic_pie.pdf", msg="My Graphic Pie")

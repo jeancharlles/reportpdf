@@ -1,10 +1,10 @@
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4, letter
+# from reportlab.pdfgen import canvas
+# from django.contrib.auth.models import User
+from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Preformatted
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.units import inch
-# from django.contrib.auth.models import User
 from .models import Contact
 
 
@@ -50,24 +50,24 @@ class MyPrint:
             elements.append(Paragraph(text='Nome2:' + contact.first_name, style=styles['Heading1']))
             elements.append(Paragraph(text='Sobrenome2: ' + contact.last_name, style=styles['Heading1']))
             elements.append(Preformatted(text='Idade2:' + str(contact.age), style=styles['Heading1'], newLineChars=" "))
-            elements.append(Paragraph(text=" "))
+            # elements.append(Paragraph(text=" "))
 
-        def myOnFirstPage(canvas, document):
+        def myonfirstpage(canvas, document):
             canvas.saveState()
             canvas.setFont(psfontname="Helvetica-Bold", size=18)
             canvas.drawCentredString(x=3 * inch, y=11 * inch, text="Title")
-            canvas.setFont(psfontname="Times-Roman", size=9)
-            canvas.drawString(x=1 * inch, y=0.75 * inch, text="Introdução")
+            canvas.setFont(psfontname="Times-Roman", size=12)
+            canvas.drawString(x=3 * inch, y=0.75 * inch, text="Introdução")
             canvas.restoreState()
 
-        def myLaterPages(canvas, document):
+        def mylaterpages(canvas, document):
             canvas.saveState()
             canvas.setFont(psfontname="Times-Roman", size=9)
             canvas.drawString(x=1 * inch, y=0.75 * inch, text="Página")
             canvas.drawString(x=1.5 * inch, y=0.75 * inch, text=str(canvas.getPageNumber()))
             canvas.restoreState()
 
-        doc.build(flowables=elements, onFirstPage=myOnFirstPage, onLaterPages=myLaterPages)
+        doc.build(flowables=elements, onFirstPage=myonfirstpage, onLaterPages=mylaterpages)
         # doc.build(lines)
 
         pdf = buffer.getvalue()

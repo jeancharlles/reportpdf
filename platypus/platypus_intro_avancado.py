@@ -2,6 +2,9 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
 from reportlab.lib.pagesizes import A4
+import io
+from django.http import FileResponse
+from reportlab.pdfgen.canvas import Canvas
 
 
 styles = getSampleStyleSheet()
@@ -28,7 +31,9 @@ def mylaterpages(canvas, doc):
 
 
 def go():
-    doc = SimpleDocTemplate(filename="platypus_intro.pdf", pagesize=A4, title="Lista")
+    buffer = io.BytesIO()
+    pdf = Canvas(buffer, pagesize=A4)
+    doc = SimpleDocTemplate(filename="platypus_intro2.pdf", pagesize=A4, title="Lista")
     story = [Spacer(1, 2*inch)]
     style = styles["Normal"]
     for i in range(20):
@@ -38,8 +43,14 @@ def go():
         story.append(Spacer(width=1, height=0.2*inch))
 
     doc.build(flowables=story, onFirstPage=myfirstpage, onLaterPages=mylaterpages)
+    text_object = pdf.beginText()
+    text_object.setTextOrigin(x=2*inch, y=2*inch)
+    pdf.drawText(aTextObject=doc)
+    pdf.showPage()
+    pdf.save()
+    buffer.seek(0)
 
-    return doc
+    return FileResponse(buffer, as_attachment=False, filename='platypus_intro_avancado.pdf')
 
 
 if __name__ == '__main__':

@@ -26,7 +26,7 @@ def create_simple_form():
                    borderColor=green, fillColor=magenta, textColor=blue,
                    forceBorder=True)
 
-    c.drawString(10, 550, 'Address:')
+    c.drawString(x=10, y=550, text='Address:')
     form.textfield(name='address', tooltip='Address',
                    x=110, y=535,
                    width=400,

@@ -5,7 +5,7 @@ from reportlab.pdfgen import canvas
 
 
 pdf = SimpleDocTemplate(filename="platypus_example.pdf")
-flow_obj = []
+flow_obj = list()
 styles = getSampleStyleSheet()
 text = """
 hello from total technology

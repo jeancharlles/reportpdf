@@ -19,5 +19,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path('', include('relatorio.urls')),
+    path('pdf/', include('printing.urls')),
     path('admin/', admin.site.urls),
 ]

@@ -1,7 +1,7 @@
 from reportlab.pdfgen import canvas
 from reportlab.lib import pdfencrypt
 
-enc = pdfencrypt.StandardEncryption("rptlab", canPrint=0)
+enc = pdfencrypt.StandardEncryption(userPassword="rptlab", canPrint=0)
 
 
 def hello(c):

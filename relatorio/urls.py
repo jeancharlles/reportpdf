@@ -14,5 +14,5 @@ urlpatterns = [
     path('reportpdfpage/', reportpdfpage, name='reportpdfpage'),
     path('contact-list/', ContactListView.as_view(), name='contact-list'),
     path('contact-detail/<int:pk>/', ContactDetailView.as_view(), name='contact-detail'),
-    path('printing2/', print_users, name='printing2')
+    path('printing2/', print_users, name='printing2'),
 ]

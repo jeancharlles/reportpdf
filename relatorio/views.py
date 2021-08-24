@@ -43,7 +43,7 @@ class ContactDetailView(DetailView):
         return context
 
 
-def print_users(request):
+def print_users(request):  # Certa
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="printing.pdf"'
     buffer = BytesIO()

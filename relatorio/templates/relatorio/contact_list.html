@@ -8,11 +8,15 @@
   <h1>Contacts</h1>
   <ul>
   {% for object in object_list %}
-      <li><a href="{% url 'contact-detail' object.id %}">id</a> {{ object.first_name }} {{ object.last_name }} {{ object.age }}</li>
+      <li>
+          <a href="{% url 'contact-detail' object.id %}">id</a>
+            {{ object.first_name }} {{ object.last_name }} {{ object.age }}
+          <a href="{% url 'contact-detailpdf' object.id %}">pdf</a>
+          <a href="{% url 'contact-detailpdf2' object.id %}">pdf2</a>
+      </li>
   {% empty %}
       <li>No contacts yet.</li>
   {% endfor %}
   </ul>
-
 </body>
 </html>

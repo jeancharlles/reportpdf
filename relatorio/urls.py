@@ -1,7 +1,5 @@
 from django.urls import path
-# from relatorio.views import some_view, some_view2, some_view3, \
-#     PDFView, ContactListView, ContactDetailView, IndexView, reportpdf, reportpdfpage
-from .views import *
+from relatorio.views import *
 
 urlpatterns = [
     path('pdf/', PDFView.as_view(), name='pdf'),
@@ -14,5 +12,7 @@ urlpatterns = [
     path('reportpdfpage/', reportpdfpage, name='reportpdfpage'),
     path('contact-list/', ContactListView.as_view(), name='contact-list'),
     path('contact-detail/<int:pk>/', ContactDetailView.as_view(), name='contact-detail'),
+    path('contact-detailpdf/<int:pk>/', detail_pdf, name='contact-detailpdf'),
+    path('contact-detailpdf2/<int:pk>/', print_users2, name='contact-detailpdf2'),
     path('printing2/', print_users, name='printing2'),
 ]

@@ -1,20 +1,17 @@
 from io import BytesIO
-from django.http import FileResponse
-
+from django.http import FileResponse, HttpResponse
+from .printing import MyPrint, DetailPdf
+from platypus.platypus_intro import myfirstpage, mylaterpages, go
+from django.views.decorators.http import require_http_methods
 # ReportLab
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.units import cm, inch
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.colors import blue, black, green, gold, red, royalblue
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 
 # WeasyPrint
 # from django.core.files.storage import FileSystemStorage
 # from django.template.loader import render_to_string
-from django.http import HttpResponse
-from .printing import MyPrint
-
 from weasyprint import HTML
 
 # Views Generics
@@ -22,8 +19,6 @@ from django.views.generic.base import TemplateView, View
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from relatorio.models import Contact
-
-from platypus.platypus_intro import myfirstpage, mylaterpages, go
 
 
 class IndexView(TemplateView):
@@ -39,13 +34,61 @@ class ContactDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         return context
 
 
-def print_users(request):  # Certa
+def detail_pdf(request, pk):  # Certa e Funcionando OK!
+    buffer = BytesIO()
+
+    pdf = Canvas(buffer, pagesize=A4)
+    pdf.setTitle(title="Detail")
+    pdf.setAuthor(author="JC9")
+    pdf.setSubject(subject="Cliente")
+
+    text_object = pdf.beginText(x=0, y=0)
+    text_object.setTextOrigin(x=2*cm, y=25*cm)
+    text_object.setFont(psfontname="Helvetica", size=14)
+
+    contact = Contact.objects.get(id=pk)
+
+    lines = list()
+    lines.append(f'Nome: {contact.first_name}')
+    lines.append(f'Sobrenome: ' + contact.last_name)
+    lines.append(f'Idade: {contact.age}')
+    lines.append(" ")
+
+    # Insiro da lista lines cada linha em text_object
+    for line in lines:
+        text_object.textLines(stuff=str(line))
+
+    # Desenho o text_object
+    pdf.drawCentredString(x=10.5*cm, y=27*cm, text="Cliente")
+    pdf.drawText(aTextObject=text_object)
+    pdf.setFont(psfontname="Helvetica", size=14)
+    pdf.drawCentredString(x=10.5*cm, y=1*cm, text=f'Página {str(pdf.getPageNumber())}')
+    pdf.showPage()
+    pdf.save()
+    buffer.seek(0)
+
+    return FileResponse(buffer, as_attachment=False, filename='detail.pdf')
+
+
+@require_http_methods(['GET'])
+def print_users2(request, pk):  # Certa e Funcionando Tudo OK!
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="printing.pdf"'
+    # response['Content-Disposition'] = 'attachment; filename="detail2.pdf"'
+    response['Content-Disposition'] = 'inline; filename="detail2.pdf"'
+    buffer = BytesIO()
+    report = DetailPdf(buffer, request=request, pk=pk, pagesize='A4')
+    pdf = report.detail_pdf2()
+    response.write(pdf)
+    return response
+
+
+def print_users(request):  # Certa e Funcionando Tudo OK!
+    response = HttpResponse(content_type='application/pdf')
+    # response['Content-Disposition'] = 'attachment; filename="printing.pdf"'
+    response['Content-Disposition'] = 'inline; filename="printing.pdf"'
     buffer = BytesIO()
     report = MyPrint(buffer, 'A4')
     pdf = report.print_users()

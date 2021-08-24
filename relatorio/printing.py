@@ -1,11 +1,12 @@
-# from reportlab.pdfgen import canvas
+from reportlab.pdfgen.canvas import Canvas
 # from django.contrib.auth.models import User
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Preformatted, Spacer
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER
-from reportlab.lib.units import inch
+from reportlab.lib.units import inch, cm
 from .models import Contact
+from io import BytesIO
 
 
 class MyPrint:
@@ -73,3 +74,64 @@ class MyPrint:
         buffer.close()
 
         return pdf
+
+
+class DetailPdf:
+    def __init__(self, buffer, request, pk, pagesize):
+        self.buffer = buffer
+        self.request = request
+        self.pk = pk
+        if pagesize == 'A4':
+            self.pagesize = A4
+        # elif pagesize == 'Letter':
+        #     self.pagesize = letter
+        self.width, self.height = self.pagesize
+
+    def detail_pdf2(self):
+        buffer = self.buffer
+        pk = self.pk
+        doc = SimpleDocTemplate(buffer,
+                                rightMargin=72,
+                                leftMargin=72,
+                                topMargin=72,
+                                bottomMargin=72,
+                                title='Printing',
+                                author='JC9',
+                                subject='Detail Client',
+                                pagesize=self.pagesize)
+        elements = list()
+
+        contact = Contact.objects.get(id=pk)
+
+        styles = getSampleStyleSheet()
+        styles.add(ParagraphStyle(name='centered', alignment=TA_CENTER))
+
+        elements.append(Paragraph(text='Nome: ' + contact.first_name, style=styles['Normal']))
+        elements.append(Paragraph(text='Sobrenome: ' + contact.last_name, style=styles['Normal']))
+        elements.append(Preformatted(text='Idade: ' + str(contact.age), style=styles['Normal']))
+        elements.append(Spacer(width=0.5*inch, height=0.5*inch))
+
+        def myonfirstpage(canvas, document):
+            canvas.saveState()
+            canvas.setFont(psfontname="Helvetica-Bold", size=18)
+            canvas.drawCentredString(x=3 * inch, y=11 * inch, text="Cliente")
+            canvas.setFont(psfontname="Times-Roman", size=12)
+            canvas.drawString(x=3 * inch, y=0.75 * inch, text="Página 1")
+            canvas.restoreState()
+
+        def mylaterpages(canvas, document):
+            canvas.saveState()
+            canvas.setFont(psfontname="Times-Roman", size=9)
+            canvas.drawString(x=1 * inch, y=0.75 * inch, text="Página")
+            canvas.drawString(x=1.5 * inch, y=0.75 * inch, text=str(canvas.getPageNumber()))
+            canvas.restoreState()
+
+        doc.build(flowables=elements, onFirstPage=myonfirstpage, onLaterPages=mylaterpages)
+
+        pdf = buffer.getvalue()
+        buffer.close()
+
+        return pdf
+
+
+

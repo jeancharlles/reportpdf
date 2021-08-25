@@ -1,12 +1,11 @@
-from reportlab.pdfgen.canvas import Canvas
+# from reportlab.pdfgen.canvas import Canvas
 # from django.contrib.auth.models import User
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Preformatted, Spacer
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER
-from reportlab.lib.units import inch, cm
+from reportlab.lib.units import inch
 from .models import Contact
-from io import BytesIO
 
 
 class MyPrint:
@@ -29,8 +28,9 @@ class MyPrint:
                                 author='JC9',
                                 subject='Lista de Clientes',
                                 pagesize=self.pagesize)
-        elements = list()
+        flow_obj = list()
 
+        # <---List object--->
         contacts = Contact.objects.all()
 
         styles = getSampleStyleSheet()
@@ -38,19 +38,19 @@ class MyPrint:
 
         # lines = list()
         # users = User.objects.all()
-        # elements.append(Paragraph('My User Names', styles['Heading1']))
+        # flow_obj.append(Paragraph('My User Names', styles['Heading1']))
         # for i, user in enumerate(users):
-        #     elements.append(Paragraph(user.get_full_name(), styles['Normal']))
+        #     flow_obj.append(Paragraph(user.get_full_name(), styles['Normal']))
         # Lista todos os objetos e adiciono cada a lista lines
         # for contact in contacts:
         #     lines.append(f'Nome1: {contact.first_name}')
         #     lines.append(f'Sobrenome1: ' + contact.last_name)
 
         for i, contact in enumerate(contacts):
-            elements.append(Paragraph(text='Nome2:' + contact.first_name, style=styles['Heading1']))
-            elements.append(Paragraph(text='Sobrenome2: ' + contact.last_name, style=styles['Heading1']))
-            elements.append(Preformatted(text='Idade2:' + str(contact.age), style=styles['Heading1']))
-            elements.append(Spacer(width=0.5*inch, height=0.5*inch))
+            flow_obj.append(Paragraph(text='Nome2:' + contact.first_name, style=styles['Heading1']))
+            flow_obj.append(Paragraph(text='Sobrenome2: ' + contact.last_name, style=styles['Heading1']))
+            flow_obj.append(Preformatted(text='Idade2:' + str(contact.age), style=styles['Heading1']))
+            flow_obj.append(Spacer(width=0.5*inch, height=0.5*inch))
 
         def myonfirstpage(canvas, document):
             canvas.saveState()
@@ -67,7 +67,7 @@ class MyPrint:
             canvas.drawString(x=1.5 * inch, y=0.75 * inch, text=str(canvas.getPageNumber()))
             canvas.restoreState()
 
-        doc.build(flowables=elements, onFirstPage=myonfirstpage, onLaterPages=mylaterpages)
+        doc.build(flowables=flow_obj, onFirstPage=myonfirstpage, onLaterPages=mylaterpages)
         # doc.build(lines)
 
         pdf = buffer.getvalue()
@@ -99,17 +99,18 @@ class DetailPdf:
                                 author='JC9',
                                 subject='Detail Client',
                                 pagesize=self.pagesize)
-        elements = list()
+        flow_obj = list()
 
+        # <---Detail object--->
         contact = Contact.objects.get(id=pk)
 
         styles = getSampleStyleSheet()
         styles.add(ParagraphStyle(name='centered', alignment=TA_CENTER))
 
-        elements.append(Paragraph(text='Nome: ' + contact.first_name, style=styles['Normal']))
-        elements.append(Paragraph(text='Sobrenome: ' + contact.last_name, style=styles['Normal']))
-        elements.append(Preformatted(text='Idade: ' + str(contact.age), style=styles['Normal']))
-        elements.append(Spacer(width=0.5*inch, height=0.5*inch))
+        flow_obj.append(Paragraph(text='Nome: ' + contact.first_name, style=styles['Normal']))
+        flow_obj.append(Paragraph(text='Sobrenome: ' + contact.last_name, style=styles['Normal']))
+        flow_obj.append(Preformatted(text='Idade: ' + str(contact.age), style=styles['Normal']))
+        flow_obj.append(Spacer(width=0.5*inch, height=0.5*inch))
 
         def myonfirstpage(canvas, document):
             canvas.saveState()
@@ -126,12 +127,9 @@ class DetailPdf:
             canvas.drawString(x=1.5 * inch, y=0.75 * inch, text=str(canvas.getPageNumber()))
             canvas.restoreState()
 
-        doc.build(flowables=elements, onFirstPage=myonfirstpage, onLaterPages=mylaterpages)
+        doc.build(flowables=flow_obj, onFirstPage=myonfirstpage, onLaterPages=mylaterpages)
 
         pdf = buffer.getvalue()
         buffer.close()
 
         return pdf
-
-
-

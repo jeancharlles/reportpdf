@@ -3,6 +3,7 @@ from django.http import FileResponse, HttpResponse
 from .printing import MyPrint, DetailPdf
 from platypus.platypus_intro import myfirstpage, mylaterpages, go
 from django.views.decorators.http import require_http_methods
+
 # ReportLab
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.units import cm, inch
@@ -85,6 +86,7 @@ def print_users2(request, pk):  # Certa e Funcionando Tudo OK!
     return response
 
 
+@require_http_methods(['GET'])
 def print_users(request):  # Certa e Funcionando Tudo OK!
     response = HttpResponse(content_type='application/pdf')
     # response['Content-Disposition'] = 'attachment; filename="printing.pdf"'

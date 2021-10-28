@@ -4,11 +4,26 @@
     <meta charset="UTF-8">
     <title>Index</title>
 </head>
-<body>
 
-<a href="{% url 'some' %}">some</a>
+<body>
 <br>
-<a href="{% url 'some2' %}">some2</a>
+<p>
+    View simples e sem relacionamento com models.
+    <a href="{% url 'some' %}">Exemplo com Draw String - some</a>
+</p>
+
+<br>
+<p>
+    View que utiliza o model de modo predeterminado.
+    <a href="{% url 'some2' %}">Exemplo com Model pre-determinado</a>
+</p>
+
+<br>
+<p>
+    View que utiliza o model, mas que usa listagem e filtro
+    <a href="{% url 'pdf' %}">Exemplo com Model listagem e filtro</a>
+</p>
+
 <br>
 <a href="{% url 'reportpdf' %}">reportpdf</a>
 <br>
@@ -18,8 +33,6 @@
 <a href="{% url 'printing2' %}">printing2</a>
 <br>
 <a href="{% url 'contact-list' %}">list</a>
-
-
 
 </body>
 </html>

@@ -19,6 +19,8 @@ from weasyprint import HTML
 from django.views.generic.base import TemplateView, View
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
+
+# Model
 from relatorio.models import Contact
 
 
@@ -146,18 +148,20 @@ class PDFView(View):
     @staticmethod
     def get(request, *args, **kwargs):
 
-        # ------- Configuração Inicial-------------#
+        # ------- Configuração da Página-------------#
         buffer = BytesIO()
         pdf = Canvas(buffer, pagesize=A4)
-        pdf.setTitle(title="Listagem de Nomes")
-        contato = Contact()
+        pdf.setTitle(title="Lista de Nomes")
 
-        # ------- Nome ----------------------------#
+        # -----------------1ª Parte-----------------------
+
+        # ------- Desenho do Cabeçalho---------------#
         pdf.setFont(psfontname="Helvetica-Bold", size=12)
         pdf.setFillColor(aColor=black)
         pdf.drawString(x=2*cm, y=27*cm, text='Nome Completo: ')
 
-        pdf.setStrokeColor(aColor=royalblue)
+        # ------- Desenho da linha abaixo do Cabeçalho
+        pdf.setStrokeColor(aColor=royalblue)  # Linha Azul
         pdf.line(x1=2*cm, y1=26.8*cm, x2=6.5*cm, y2=26.8*cm)
 
         # texto = str(Contact.objects.filter(pk=1).get())
@@ -174,32 +178,39 @@ class PDFView(View):
         # for nome in texto:
         #     textobject.textLines(stuff=str(nome), trim=1)
 
+        # -------- Configuração e Desenho do Objeto -----------#
+
+        # -------- Desenho da Lista de Pessoas do Model----
         texto = Contact.objects.all()
         textobject = pdf.beginText(x=2*cm, y=26*cm)
         textobject.setFont(psfontname="Helvetica-Oblique", size=14)
         textobject.setFillColor(aColor=gold)
-        for idade in texto.age:
-            textobject.textLines(stuff=str(idade), trim=1)
-
+        for pessoa in texto:
+            textobject.textLines(stuff=str(pessoa), trim=1)
         pdf.drawText(aTextObject=textobject)
 
-        # ------------- Idade --------------#
+        # ------------------2ª Parte------------------------
+
+        # --------- Configuração do 2º Cabeçalho---------
         pdf.setFont(psfontname="Courier-Bold", size=14)
         pdf.setFillColor(aColor=green)
-        pdf.drawString(x=2 * cm, y=23 * cm, text='Idade menor que 50: ')
+        pdf.drawString(x=2 * cm, y=14 * cm, text='Idade menor que: ')
 
-        pdf.setStrokeColor(aColor=red)
-        pdf.line(x1=2 * cm, y1=22.8 * cm, x2=8 * cm, y2=22.8 * cm)
+        # --------- Desenho da linha abaixo do Cabeçalho
+        pdf.setStrokeColor(aColor=red)  # Linha Vermelha
+        pdf.line(x1=2 * cm, y1=13.8 * cm, x2=8 * cm, y2=13.8 * cm)
 
-        idade = Contact.objects.filter(age__lt=50)
-        idadeobject = pdf.beginText(x=2*cm, y=22*cm)
+        # --------- Desenho do Resultado do Filtro -------------
+        idade = Contact.objects.filter(age__lt=19)
+        idadeobject = pdf.beginText(x=2*cm, y=13*cm)
         pdf.setFillColor(aColor=blue)
 
+        # --------- Desenho das pessoas que atendem ao filtro-----
         for i in idade:
             idadeobject.textLines(stuff=str(i), trim=1)
         pdf.drawText(aTextObject=idadeobject)
 
-        # ------- Apresentação Final do PDF -------------------#
+        # --------- Apresentação Final do PDF -------------------#
         pdf.showPage()
         pdf.save()
         buffer.seek(0)
@@ -216,7 +227,7 @@ def some_view(request):
 
     # Draw things on the PDF. Here's where the PDF generation happens.
     # See the ReportLab documentation for the full list of functionality.
-    p.drawString(100, 100, "JC9.")
+    p.drawString(x=100, y=400, text="JC9.")
 
     # Close the PDF object cleanly, and we're done.
     p.showPage()
@@ -225,7 +236,7 @@ def some_view(request):
     # FileResponse sets the Content-Disposition header so that browsers
     # present the option to save the file.
     buffer.seek(0)
-    return FileResponse(buffer, as_attachment=True, filename='some.pdf')
+    return FileResponse(buffer, as_attachment=False, filename='some.pdf')
 
 
 # --------------------------- ReportLab 4--------------------------------#

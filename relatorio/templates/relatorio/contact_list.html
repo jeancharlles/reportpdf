@@ -13,6 +13,7 @@
             {{ object.first_name }} {{ object.last_name }} {{ object.age }}
           <a href="{% url 'contact-detailpdf' object.id %}">pdf</a>
           <a href="{% url 'contact-detailpdf2' object.id %}">pdf2</a>
+          <br>
       </li>
   {% empty %}
       <li>No contacts yet.</li>

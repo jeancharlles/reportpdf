@@ -1,1 +1,1 @@
-from relatorio.models import Contact
+# from relatorio.models import Contact

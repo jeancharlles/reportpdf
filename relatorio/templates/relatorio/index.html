@@ -8,31 +8,44 @@
 <body>
 <br>
 <p>
-    View simples e sem relacionamento com models.
+    App relatório - View simples e sem relacionamento com models.<br>
     <a href="{% url 'some' %}">Exemplo com Draw String - some</a>
 </p>
 
 <br>
 <p>
-    View que utiliza o model de modo predeterminado.
+    App relatório - View que utiliza o model de modo predeterminado.<br>
     <a href="{% url 'some2' %}">Exemplo com Model pre-determinado</a>
 </p>
 
 <br>
 <p>
-    View que utiliza o model, mas que usa listagem e filtro
+    App relatório - View que utiliza o model, mas que usa listagem e filtro<br>
     <a href="{% url 'pdf' %}">Exemplo com Model listagem e filtro</a>
 </p>
 
 <br>
-<a href="{% url 'reportpdf' %}">reportpdf</a>
+<p>
+    App relatório - View que utiliza o model e que enumera página única<br>
+    <a href="{% url 'reportpdf' %}">Exemplo com Model e Numeração de Página Única</a>
+</p>
+
 <br>
 <!--<a href="{% url 'reportpdfpage' %}">reportpdfpage</a>-->
-<a href="{% url 'printing' %}">printing</a>
+<p>
+    App relatório - View que lista Models com mais de uma página, introdução na primeira página,
+    e classe externa em outro arquivo printing.py na classe MyPrint.<br>
+    <a href="{% url 'lista' %}">Exemplo com Model e Numeração de Páginas em um arquivo printing</a>
+</p>
+
 <br>
-<a href="{% url 'printing2' %}">printing2</a>
+<p>
+    App printing - View que lista models de usuário simples. Foi o primeiro teste<br>
+    <a href="{% url 'printing' %}">Primeiro teste print_users</a>
+</p>
 <br>
-<a href="{% url 'contact-list' %}">list</a>
+
+<a href="{% url 'contact-list' %}">Contact list</a>
 
 </body>
 </html>

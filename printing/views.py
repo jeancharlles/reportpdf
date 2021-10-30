@@ -5,7 +5,8 @@ from io import BytesIO
 
 def print_users(request):
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="myuser.pdf"'
+    # response['Content-Disposition'] = 'attachment; filename="myuser.pdf"'
+    response['Content-Disposition'] = 'inline; filename="myuser.pdf"'
 
     buffer = BytesIO()
 

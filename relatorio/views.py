@@ -1,10 +1,9 @@
 from io import BytesIO
 from django.http import FileResponse, HttpResponse
-from .printing import MyPrint, DetailPdf
-from platypus.platypus_intro import myfirstpage, mylaterpages, go
 from django.views.decorators.http import require_http_methods
 
 # ReportLab
+from platypus.platypus_intro import myfirstpage, mylaterpages, go
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.units import cm, inch
 from reportlab.lib.pagesizes import A4
@@ -23,6 +22,10 @@ from django.views.generic.detail import DetailView
 # Model
 from relatorio.models import Contact
 
+# Printing próprios
+from relatorio.reports.printing_list import ListPdf
+from relatorio.reports.printing_detail import DetailPdf
+
 
 class IndexView(TemplateView):
     template_name = "relatorio/index.html"
@@ -40,6 +43,7 @@ class ContactDetailView(DetailView):
         return context
 
 
+# -----View que configura dentro dela sem usar arquivo externo
 def detail_pdf(request, pk):  # Certa e Funcionando OK!
     buffer = BytesIO()
 
@@ -76,8 +80,9 @@ def detail_pdf(request, pk):  # Certa e Funcionando OK!
     return FileResponse(buffer, as_attachment=False, filename='detail.pdf')
 
 
+# ----View que configura fora dela na Classe DetailPdf, usando arquivo externo printing_detail.py
 @require_http_methods(['GET'])
-def print_users2(request, pk):  # Certa e Funcionando Tudo OK!
+def detail_pdf2(request, pk):  # Certa e Funcionando Tudo OK!
     response = HttpResponse(content_type='application/pdf')
     # response['Content-Disposition'] = 'attachment; filename="detail2.pdf"'
     response['Content-Disposition'] = 'inline; filename="detail2.pdf"'
@@ -88,53 +93,58 @@ def print_users2(request, pk):  # Certa e Funcionando Tudo OK!
     return response
 
 
+# ----View que configura fora dela uma lista Models com página e da classe ListPdf em arquivo externo printing_list.py
 @require_http_methods(['GET'])
-def print_users(request):  # Certa e Funcionando Tudo OK!
+def lista(request):  # Certa e Funcionando Tudo OK!
     response = HttpResponse(content_type='application/pdf')
     # response['Content-Disposition'] = 'attachment; filename="printing.pdf"'
     response['Content-Disposition'] = 'inline; filename="printing.pdf"'
     buffer = BytesIO()
-    report = MyPrint(buffer, 'A4')
-    pdf = report.print_users()
+    report = ListPdf(buffer, 'A4')  # define a variável report que instancia a classe ListPdf
+    pdf = report.lista()  # aqui instancia o pdf buscando a função lista em printing_list.py
     response.write(pdf)
     return response
 
 
+# Não funciona
 def reportpdfpage(request):
     go()
 
 
+# ----Exemplo ReportLab com Model e Numeração de Página Única---------#
 def reportpdf(request):
-    buffer = BytesIO()
 
+    # ------- Configuração da Página-------------
+    buffer = BytesIO()
     pdf = Canvas(buffer, pagesize=A4)
     pdf.setTitle(title="Listagem de Nomes")
     pdf.setAuthor(author="JC9")
     pdf.setSubject(subject="Listagem de Nomes dos Clientes")
 
+    # --------Criação e Configuração do text_object-----
     text_object = pdf.beginText(x=0, y=0)
-    text_object.setTextOrigin(x=2*cm, y=25*cm)
-    text_object.setFont(psfontname="Helvetica", size=14)
+    text_object.setTextOrigin(x=2*cm, y=27*cm)
+    text_object.setFont(psfontname="Helvetica", size=12)
 
+    # --------Configuração do Model ---------------
     contacts = Contact.objects.all()
 
+    # Cria-se a lista e adiciono todos os objetos
     lines = list()
-
-    # Lista todos os objetos e adiciono cada a lista lines
     for contact in contacts:
         lines.append(f'Nome: {contact.first_name}')
         lines.append(f'Sobrenome: ' + contact.last_name)
         lines.append(f'Idade: {contact.age}')
         lines.append(" ")
 
-    # Insiro da lista lines cada linha em text_object
+    # Retiro da lista cada objeto em text_object
     for line in lines:
         text_object.textLines(stuff=str(line))
 
-    # Desenho o text_object
+    # --------Desenho o text_object com numeração de páginas--------------
     pdf.drawText(aTextObject=text_object)
-    pdf.setFont(psfontname="Helvetica", size=14)
-    pdf.drawCentredString(x=10.5*cm, y=1*cm, text=f'Página {str(pdf.getPageNumber())}')
+    pdf.setFont(psfontname="Helvetica", size=12)
+    pdf.drawCentredString(x=10.5*cm, y=2*cm, text=f'Página {str(pdf.getPageNumber())}')
     pdf.showPage()
     pdf.save()
     buffer.seek(0)
@@ -142,20 +152,19 @@ def reportpdf(request):
     return FileResponse(buffer, as_attachment=False, filename='report.pdf')
 
 
-# --------------------------- ReportLab 2---------------------------------#
+# ----Exemplo ReportLab com Model que configura dentro dela---------------#
 class PDFView(View):
-
     @staticmethod
     def get(request, *args, **kwargs):
 
-        # ------- Configuração da Página-------------#
+        # ------- Configuração da Página-------------
         buffer = BytesIO()
         pdf = Canvas(buffer, pagesize=A4)
         pdf.setTitle(title="Lista de Nomes")
 
-        # -----------------1ª Parte-----------------------
+        # -----------------1ª Parte------------------
 
-        # ------- Desenho do Cabeçalho---------------#
+        # ------- Desenho do Cabeçalho---------------
         pdf.setFont(psfontname="Helvetica-Bold", size=12)
         pdf.setFillColor(aColor=black)
         pdf.drawString(x=2*cm, y=27*cm, text='Nome Completo: ')
@@ -164,21 +173,18 @@ class PDFView(View):
         pdf.setStrokeColor(aColor=royalblue)  # Linha Azul
         pdf.line(x1=2*cm, y1=26.8*cm, x2=6.5*cm, y2=26.8*cm)
 
+        # ----Funcionando outras opções----#
         # texto = str(Contact.objects.filter(pk=1).get())
-        # texto = str(Contact.objects.all().values())
-        # texto = str(Contact.objects.all().values_list())
-        # texto = str(Contact.objects.all())
         # texto = str(Contact.objects.all().first())
-        # ----Funcionando ----#
         # texto = Contact.objects.all().order_by('first_name')
-        # texto = Contact.objects.all().order_by('-first_name') # ordem inversa
+        # texto = Contact.objects.all().order_by('-first_name')  # ordem inversa
         # textobject = pdf.beginText(x=2*cm, y=26*cm)
         # textobject.setFont(psfontname="Helvetica-Oblique", size=14)
         # textobject.setFillColor(aColor=gold)
         # for nome in texto:
         #     textobject.textLines(stuff=str(nome), trim=1)
 
-        # -------- Configuração e Desenho do Objeto -----------#
+        # ------ Configuração e Desenho do Objeto ---------
 
         # -------- Desenho da Lista de Pessoas do Model----
         texto = Contact.objects.all()
@@ -196,28 +202,28 @@ class PDFView(View):
         pdf.setFillColor(aColor=green)
         pdf.drawString(x=2 * cm, y=14 * cm, text='Idade menor que: ')
 
-        # --------- Desenho da linha abaixo do Cabeçalho
+        # --------- Desenho da linha abaixo do Cabeçalho -------
         pdf.setStrokeColor(aColor=red)  # Linha Vermelha
         pdf.line(x1=2 * cm, y1=13.8 * cm, x2=8 * cm, y2=13.8 * cm)
 
-        # --------- Desenho do Resultado do Filtro -------------
+        # --------- Elaboração do Filtro ---------------
         idade = Contact.objects.filter(age__lt=19)
         idadeobject = pdf.beginText(x=2*cm, y=13*cm)
-        pdf.setFillColor(aColor=blue)
 
-        # --------- Desenho das pessoas que atendem ao filtro-----
+        # --------- Desenho das pessoas que atendem ao filtro----
         for i in idade:
             idadeobject.textLines(stuff=str(i), trim=1)
+        pdf.setFillColor(aColor=blue)
         pdf.drawText(aTextObject=idadeobject)
 
-        # --------- Apresentação Final do PDF -------------------#
+        # --------- Apresentação Final do PDF -------------------
         pdf.showPage()
         pdf.save()
         buffer.seek(0)
         return FileResponse(buffer, as_attachment=False, filename='index.pdf')
 
 
-# --------------------------- ReportLab 3 -------------------------------#
+# -------Exemplo com Draw String que configura dentro dela------------
 def some_view(request):
     # Create a file-like buffer to receive PDF data.
     buffer = BytesIO()
@@ -239,7 +245,7 @@ def some_view(request):
     return FileResponse(buffer, as_attachment=False, filename='some.pdf')
 
 
-# --------------------------- ReportLab 4--------------------------------#
+# -------View que configura dentro dela utilizando Model -----------------
 def some_view2(request):
     # Crie o objeto HttpResponse com o cabeçalho de PDF apropriado.
     response = HttpResponse(content_type='application/pdf')
